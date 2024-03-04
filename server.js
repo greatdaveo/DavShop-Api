@@ -1,10 +1,21 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const cors = require("cors");
 
 dotenv.config();
 
 const app = express();
+
+// Middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(
+  cors({
+    origin: ["http://localhost:5173/", "http://dee-shop.vercel.app"],
+    credentials: true,
+  })
+);
 
 app.get("/test", (req, res) => {
   res.send("API Testing!!!");
