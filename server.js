@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const userRoute = require("../api/routes/userRoute");
+const errorHandler = require("../api/Middleware/errorHandler");
 
 dotenv.config();
 
@@ -17,6 +18,8 @@ app.use(
     credentials: true,
   })
 );
+// Error Middleware
+app.use(errorHandler);
 
 // Registration Route
 app.use("/api/user", userRoute);
@@ -24,6 +27,8 @@ app.use("/api/user", userRoute);
 app.get("/test", (req, res) => {
   res.send("API Testing!!!");
 });
+
+
 
 const PORT = process.env.PORT || 3000;
 
