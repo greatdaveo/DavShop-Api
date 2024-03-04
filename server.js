@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const userRoute = require("../api/routes/userRoute");
 
 dotenv.config();
 
@@ -16,6 +17,9 @@ app.use(
     credentials: true,
   })
 );
+
+// Registration Route
+app.use("/api/user", userRoute);
 
 app.get("/test", (req, res) => {
   res.send("API Testing!!!");
