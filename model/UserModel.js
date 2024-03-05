@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { objectId } = mongoose.Schema;
+const bcrypt = require("bcryptjs");
 
 const UserSchema = mongoose.Schema({
   name: {
@@ -27,7 +28,7 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: [true],
     default: "customer",
-    enum: ["customer", admin],
+    enum: ["customer", "admin"],
   },
 
   photo: {
@@ -44,6 +45,19 @@ const UserSchema = mongoose.Schema({
   address: {
     type: Object, //address, state, country
   },
+});
+
+// To Encrypt password before saving to the Database
+UserSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    return next();
+  } else {
+    // To Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(this.password, salt);
+    this.password = hashedPassword;
+    next();
+  }
 });
 
 const UserModel = mongoose.model("User", UserSchema);
