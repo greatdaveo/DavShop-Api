@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const UserModel = require("../../api/model/UserModel");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
 // To set User Token
 const generateToken = (id) => {
@@ -59,6 +60,44 @@ const registerUser = asyncHandler(async (req, res) => {
   res.send("Register user...");
 });
 
+const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  // To Validate user
+  if (!email || !password) {
+    res.status(400);
+    throw new Error("Please enter email and password!");
+  }
+
+  // To check if user exist
+  const user = await UserModel.findOne({ email });
+  if (!user) {
+    res.status(400);
+    throw new Error("User does not exist!");
+  }
+  // To compare password
+  const correctPassword = await bcrypt.compare(password, user.password);
+
+  // To generate token
+  const token = generateToken(user._id);
+  if (user && correctPassword) {
+    const newUser = await UserModel.findOne({ email }).select("-password");
+    res.cookie("access_token", token, {
+      path: "/",
+      httpOnly: true,
+      expires: new Date(Date.now() + 1000 * 86400),
+      // secure: true,
+      // sameSite: none,
+    });
+    // To send the user data
+    res.status(201).json(newUser);
+  } else {
+    res.status(400);
+    throw new Error("Invalid email or password!");
+  }
+});
+
 module.exports = {
   registerUser,
+  loginUser,
 };
