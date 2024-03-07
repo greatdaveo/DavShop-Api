@@ -109,21 +109,39 @@ const logoutUser = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "You have logged out successfully!" });
 });
 
-// To get the user data 
+// To get the user data
 const getUser = asyncHandler(async (req, res) => {
   const user = await UserModel.findById(req.user._id).select("-password");
 
-  if(user) {
+  if (user) {
     res.status(200).json(user);
   } else {
     res.status(400);
     throw new Error("User not found!");
   }
-})
+});
+
+// To update user data
+const updateUser = asyncHandler(async (req, res) => {
+  const user = await UserModel.findById(req.user._id);
+  if (user) {
+    const { name, phone, address } = user;
+    user.name = req.body.name || name;
+    user.phone = req.body.phone || phone;
+    user.address = req.body.address || address;
+
+    const updateUser = await user.save();
+    res.status(200).json(updateUser);
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
 
 module.exports = {
   registerUser,
   loginUser,
   logoutUser,
   getUser,
+  updateUser,
 };
