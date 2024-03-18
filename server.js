@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const userRoute = require("../api/routes/userRoute");
+const productRoute = require("./routes/ProductRoute");
 const errorHandler = require("../api/Middleware/errorHandler");
 
 dotenv.config();
@@ -20,17 +21,17 @@ app.use(
     credentials: true,
   })
 );
+
 // Error Middleware
 app.use(errorHandler);
 
-// Registration Route
+// User Route
 app.use("/api/user", userRoute);
+app.use("/api/products", productRoute);
 
 app.get("/test", (req, res) => {
   res.send("API Testing!!!");
 });
-
-
 
 const PORT = process.env.PORT || 3000;
 
