@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const ProductModel = require("../model/ProductModel");
+const mongoose = require("mongoose");
 
 // To create product
 const createProduct = asyncHandler(async (req, res) => {
@@ -154,7 +155,7 @@ const reviewProduct = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Product review has been added!" });
 });
 
-// To Delete Review
+// To Delete Review For a Particular Product
 const deleteReview = asyncHandler(async (req, res) => {
   const { userId } = req.body;
   const product = await ProductModel.findById(req.params.id);
@@ -173,6 +174,56 @@ const deleteReview = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Product review deleted!" });
 });
 
+// To edit and Update Review
+const updateReview = asyncHandler(async (req, res) => {
+  const { star, reviewComment, reviewDate, userId } = req.body;
+  const { id } = req.params;
+
+  //   //   To validate the user's review
+  if (star < 1 || !reviewComment) {
+    res.status(400);
+    throw new Error("Please add star ratings and review");
+  }
+
+  const reviewedProduct = await ProductModel.findById(id);
+//   console.log("Reviewed Product: ", reviewedProduct);
+
+  if (!reviewedProduct) {
+    res.status(404);
+    throw new Error("Product not found!");
+  }
+
+  // To edit and update a review made previously
+    // mongoose.set("debug", true);
+  const updatedReview = await ProductModel.findOneAndUpdate(
+    {
+      // To check for the two parameters I want to update
+      _id: reviewedProduct._id,
+      "ratings.userId": new mongoose.Types.ObjectId(userId).toString(),
+    },
+
+    {
+      $set: {
+        "ratings.$.star": star,
+        "ratings.$.reviewComment": reviewComment,
+        "ratings.$.reviewDate": reviewDate,
+      },
+    },
+
+    { new: true } // This will ensure it returns the modified document instead of the original
+  ).catch((error) => {
+    console.error("Error updating review:", error);
+  });
+
+  //   console.log("Updated Review: ", updatedReview);
+
+  if (updatedReview) {
+    res.status(200).json({ message: "Product review updated successfully!" });
+  } else {
+    res.status(400).json({ message: "Product review not updated!" });
+  }
+});
+
 module.exports = {
   createProduct,
   getAllProducts,
@@ -181,4 +232,5 @@ module.exports = {
   updateProduct,
   reviewProduct,
   deleteReview,
+  updateReview,
 };
