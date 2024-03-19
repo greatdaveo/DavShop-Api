@@ -34,4 +34,20 @@ const getAllCategory = asyncHandler(async (req, res) => {
   res.status(200).json(categories);
 });
 
-module.exports = { createCategory, getAllCategory };
+// To Delete a Category
+const deleteCategory = asyncHandler(async (req, res) => {
+    // Tp delete the category base on the slug and not the name
+    const slug = req.params.slug.toLowerCase();
+    const category = await CategoryModel.findOneAndDelete({slug})
+
+    if (!category) {
+        res.status(400);
+        throw new Error("Category name not found!");
+      }
+
+    res.status(200).json({message: "Category has been deleted!"})
+
+
+})
+
+module.exports = { createCategory, getAllCategory, deleteCategory };
