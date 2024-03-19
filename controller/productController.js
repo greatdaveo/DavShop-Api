@@ -42,12 +42,26 @@ const createProduct = asyncHandler(async (req, res) => {
 });
 
 // To Get all the Products from the database
-const getProducts = asyncHandler(async(req, res) => {
-    const products = await ProductModel.find().sort("-createdAt")
-    res.status(200).json(products)
-})
+const getAllProducts = asyncHandler(async (req, res) => {
+  const products = await ProductModel.find().sort("-createdAt");
+  res.status(200).json(products);
+});
+
+// To Get Single Product from the database
+const getSingleProduct = asyncHandler(async (req, res) => {
+  const singleProduct = await ProductModel.findById(req.params.id);
+
+  if (!singleProduct) {
+    res.status(404);
+    throw new Error("Products not found!");
+  }
+
+  //   To send the product to the user
+  res.status(200).json(singleProduct);
+});
 
 module.exports = {
   createProduct,
-  getProducts,
+  getAllProducts,
+  getSingleProduct,
 };
