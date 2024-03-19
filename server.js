@@ -5,6 +5,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const userRoute = require("../api/routes/userRoute");
 const productRoute = require("./routes/ProductRoute");
+const categoryRoute = require("./routes/categoryRoute");
 const errorHandler = require("../api/Middleware/errorHandler");
 
 dotenv.config();
@@ -28,6 +29,8 @@ app.use(errorHandler);
 // User Route
 app.use("/api/user", userRoute);
 app.use("/api/products", productRoute);
+app.use("/api/category", categoryRoute);
+
 
 app.get("/test", (req, res) => {
   res.send("API Testing!!!");
