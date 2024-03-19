@@ -41,6 +41,13 @@ const createProduct = asyncHandler(async (req, res) => {
   res.status(201).json(createdProduct);
 });
 
+// To Get all the Products from the database
+const getProducts = asyncHandler(async(req, res) => {
+    const products = await ProductModel.find().sort("-createdAt")
+    res.status(200).json(products)
+})
+
 module.exports = {
   createProduct,
+  getProducts,
 };
