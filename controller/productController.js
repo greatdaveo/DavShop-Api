@@ -76,52 +76,83 @@ const deleteProduct = asyncHandler(async (req, res) => {
 });
 
 // To Update Product
-const updateProduct= asyncHandler(async(req, res) => {
-     const {
-       name,
-       category,
-       brand,
-       color,
-       quantity,
-       sold,
-       regularPrice,
-       discountedPrice,
-       description,
-       image,
-       ratings,
-     } = req.body;
+const updateProduct = asyncHandler(async (req, res) => {
+  const {
+    name,
+    category,
+    brand,
+    color,
+    quantity,
+    sold,
+    regularPrice,
+    discountedPrice,
+    description,
+    image,
+    ratings,
+  } = req.body;
 
-     const product = await ProductModel.findById(req.params.id);
+  const product = await ProductModel.findById(req.params.id);
 
-     if(!product) {
-        res.status(404)
-        throw new Error("Product not found!")
-     }
+  if (!product) {
+    res.status(404);
+    throw new Error("Product not found!");
+  }
 
-    //  To update
-    const updatedProduct = await ProductModel.findByIdAndUpdate(
-      { _id: req.params.id },
+  //  To update
+  const updatedProduct = await ProductModel.findByIdAndUpdate(
+    { _id: req.params.id },
 
-      {
-        name,
-        category,
-        brand,
-        color,
-        quantity,
-        sold,
-        regularPrice,
-        discountedPrice,
-        description,
-        image,
-        ratings,
-      },
+    {
+      name,
+      category,
+      brand,
+      color,
+      quantity,
+      sold,
+      regularPrice,
+      discountedPrice,
+      description,
+      image,
+      ratings,
+    },
 
-      {new: true, runValidators: true}
-    );
+    { new: true, runValidators: true }
+  );
 
-    res.status(200).json(updatedProduct);
+  res.status(200).json(updatedProduct);
+});
 
-})
+// To make the user review products
+const reviewProduct = asyncHandler(async (req, res) => {
+  const { star, reviewComment, reviewDate } = req.body;
+  const { id } = req.params;
+
+  //   To validate the user
+  if (star < 1 || !reviewComment) {
+    res.status(400);
+    throw new Error("Please add ratings and review");
+  }
+
+  const reviewedProduct = await ProductModel.findById(id);
+
+  if (!reviewedProduct) {
+    res.status(404);
+    throw new Error("Product not found!");
+  }
+
+  //   To update the Ratings Array Object
+  reviewedProduct.ratings.push({
+    star,
+    reviewComment,
+    reviewDate,
+    name: req.user.name,
+    userId: id,
+  });
+
+  reviewedProduct.save();
+
+  res.status(200).json({ message: "Product review has been added!" });
+});
 
 module.exports = {
   createProduct,
@@ -129,4 +160,5 @@ module.exports = {
   getSingleProduct,
   deleteProduct,
   updateProduct,
+  reviewProduct,
 };
