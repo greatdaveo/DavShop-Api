@@ -8,6 +8,7 @@ const ProductSchema = mongoose.Schema(
       trim: true,
     },
 
+    // sku - Store Keeping Unit
     sku: {
       type: String,
       required: true,
@@ -51,7 +52,7 @@ const ProductSchema = mongoose.Schema(
     },
 
     discountedPrice: {
-      type: String,
+      type: Number,
       required: [true, "Please add a price!"],
       trim: true,
     },
