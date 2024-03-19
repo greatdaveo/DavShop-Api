@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const ProductModel = require("../model/ProductModel");
 
+// To create product
 const createProduct = asyncHandler(async (req, res) => {
   const {
     name,
@@ -74,9 +75,58 @@ const deleteProduct = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Product deleted successfully!" });
 });
 
+// To Update Product
+const updateProduct= asyncHandler(async(req, res) => {
+     const {
+       name,
+       category,
+       brand,
+       color,
+       quantity,
+       sold,
+       regularPrice,
+       discountedPrice,
+       description,
+       image,
+       ratings,
+     } = req.body;
+
+     const product = await ProductModel.findById(req.params.id);
+
+     if(!product) {
+        res.status(404)
+        throw new Error("Product not found!")
+     }
+
+    //  To update
+    const updatedProduct = await ProductModel.findByIdAndUpdate(
+      { _id: req.params.id },
+
+      {
+        name,
+        category,
+        brand,
+        color,
+        quantity,
+        sold,
+        regularPrice,
+        discountedPrice,
+        description,
+        image,
+        ratings,
+      },
+
+      {new: true, runValidators: true}
+    );
+
+    res.status(200).json(updatedProduct);
+
+})
+
 module.exports = {
   createProduct,
   getAllProducts,
   getSingleProduct,
   deleteProduct,
+  updateProduct,
 };
