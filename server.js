@@ -6,6 +6,8 @@ const cookieParser = require("cookie-parser");
 const userRoute = require("../api/routes/userRoute");
 const productRoute = require("./routes/ProductRoute");
 const categoryRoute = require("./routes/categoryRoute");
+const brandRoute = require("./routes/brandRoute");
+
 const errorHandler = require("../api/Middleware/errorHandler");
 
 dotenv.config();
@@ -30,6 +32,8 @@ app.use(errorHandler);
 app.use("/api/user", userRoute);
 app.use("/api/products", productRoute);
 app.use("/api/category", categoryRoute);
+app.use("/api/brand", brandRoute);
+
 
 
 app.get("/test", (req, res) => {
