@@ -8,6 +8,7 @@ const productRoute = require("./routes/ProductRoute");
 const categoryRoute = require("./routes/categoryRoute");
 const brandRoute = require("./routes/brandRoute");
 const couponRoute = require("./routes/couponRoute");
+const orderRoute = require("./routes/orderRoute");
 
 const errorHandler = require("../api/Middleware/errorHandler");
 
@@ -35,6 +36,7 @@ app.use("/api/products", productRoute);
 app.use("/api/category", categoryRoute);
 app.use("/api/brand", brandRoute);
 app.use("/api/coupon", couponRoute);
+app.use("/api/order", orderRoute);
 
 
 
