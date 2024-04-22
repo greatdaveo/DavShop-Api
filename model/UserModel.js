@@ -46,6 +46,11 @@ const UserSchema = mongoose.Schema(
     address: {
       type: Object, //address, state, country
     },
+
+    // For cart saved in the database
+    cartItems: {
+      type: [Object],
+    },
   },
 
   { timestamps: true }

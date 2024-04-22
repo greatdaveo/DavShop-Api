@@ -31,6 +31,7 @@ const ProductSchema = mongoose.Schema(
     color: {
       type: String,
       required: [true, "Please add a color!"],
+      default: "As seen",
       trim: true,
     },
 
@@ -64,7 +65,7 @@ const ProductSchema = mongoose.Schema(
     },
 
     image: {
-      type: String,
+      type: [String],
     },
 
     ratings: {

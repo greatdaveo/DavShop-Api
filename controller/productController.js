@@ -78,6 +78,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
 // To Update Product
 const updateProduct = asyncHandler(async (req, res) => {
+  // console.log(req.params.id)
   const {
     name,
     category,

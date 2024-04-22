@@ -148,6 +148,31 @@ const updatePhoto = asyncHandler(async (req, res) => {
   res.status(200).json(updatedPhoto);
 });
 
+// To save cart in the database
+const saveCart =asyncHandler(async (req, res) => {
+  const {cartItems} = req.body;
+  const user = await UserModel.findById(req.user._id)
+  if(user) {
+    user.cartItems = cartItems
+    user.save()
+    res.status(200).json({message: "Cart saved successfully"})
+  } else {
+    res.status(404);
+    throw new Error("User not found!")
+  }
+})
+
+const getCart = asyncHandler(async (req, res) =>{
+  const { cartItems } = req.body;
+  const user = await UserModel.findById(req.user._id);
+  if (user) {  
+    res.status(200).json(user.cartItems);
+  } else {
+    res.status(404);
+    throw new Error("User not found!");
+  }
+})
+
 module.exports = {
   registerUser,
   loginUser,
@@ -155,4 +180,6 @@ module.exports = {
   getUser,
   updateUser,
   updatePhoto,
+  saveCart,
+  getCart,
 };
