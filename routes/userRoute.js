@@ -22,7 +22,7 @@ router.patch("/update-profile", protect, updateUser);
 router.patch("/update-photo", protect, updatePhoto);
 // For the cart saved in the database
 router.patch("/save-cart", protect, saveCart);
-router.patch("/get-cart", protect, getCart);
+router.get("/get-cart", protect, getCart);
 
 
 
