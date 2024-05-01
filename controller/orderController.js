@@ -1,5 +1,8 @@
 const asyncHandler = require("express-async-handler");
 const OrderModel = require("../model/OrderModel");
+const ProductModel = require("../model/ProductModel");
+const { calculateTotalPrice } = require("../utils");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const createOrder = asyncHandler(async (req, res) => {
   const {
@@ -88,4 +91,51 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "The order status has been updated!" });
 });
 
-module.exports = { createOrder, getAllOrders, singleOrder, updateOrderStatus };
+// For Stripe Payment Integration
+const payWithStripe = asyncHandler(async (req, res) => {
+  const { items, shipping, description, coupon } = req.body;
+
+  // To get the products in the Database
+  const products = await ProductModel.find();
+
+  let orderAmount;
+  orderAmount = calculateTotalPrice(products, items);
+
+  if (coupon !== null && coupon?.name !== "nil") {
+    let totalAfterDiscount =
+      orderAmount - (orderAmount * coupon.discount) / 100;
+    orderAmount = totalAfterDiscount;
+  }
+
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: orderAmount,
+    currency: "gbp",
+    automatic_payment_methods: {
+      enabled: true,
+    },
+    description,
+    shipping: {
+      address: {
+        line1: shipping.line1,
+        line2: shipping.line2,
+        city: shipping.city,
+        country: shipping.country,
+        postal_code: shipping.postal_code,
+      },
+      name: shipping.name,
+      phone: shipping.phone,
+    },
+  });
+
+  res.send({
+    clientSecret: paymentIntent.client_secret,
+  });
+});
+
+module.exports = {
+  createOrder,
+  getAllOrders,
+  singleOrder,
+  updateOrderStatus,
+  payWithStripe,
+};
