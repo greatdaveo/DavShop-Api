@@ -14,7 +14,7 @@ const calculateTotalPrice = (products, cartItems) => {
     }
   });
 
-  return totalPrice;
+  return totalPrice * 100;
 };
 
 module.exports = { calculateTotalPrice };

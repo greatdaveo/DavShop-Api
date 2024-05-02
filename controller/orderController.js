@@ -2,6 +2,9 @@ const asyncHandler = require("express-async-handler");
 const OrderModel = require("../model/OrderModel");
 const ProductModel = require("../model/ProductModel");
 const { calculateTotalPrice } = require("../utils");
+const dotenv = require("dotenv");
+dotenv.config();
+
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const createOrder = asyncHandler(async (req, res) => {
@@ -93,43 +96,48 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
 // For Stripe Payment Integration
 const payWithStripe = asyncHandler(async (req, res) => {
-  const { items, shipping, description, coupon } = req.body;
+  try {
+    const { items, shipping, description, coupon } = req.body;
 
-  // To get the products in the Database
-  const products = await ProductModel.find();
+    // To get the products in the Database
+    const products = await ProductModel.find();
 
-  let orderAmount;
-  orderAmount = calculateTotalPrice(products, items);
+    let orderAmount;
+    orderAmount = calculateTotalPrice(products, items);
 
-  if (coupon !== null && coupon?.name !== "nil") {
-    let totalAfterDiscount =
-      orderAmount - (orderAmount * coupon.discount) / 100;
-    orderAmount = totalAfterDiscount;
-  }
+    if (coupon !== null && coupon?.name !== "nil") {
+      let totalAfterDiscount =
+        orderAmount - (orderAmount * coupon.discount) / 100;
+      orderAmount = totalAfterDiscount;
+    }
 
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: orderAmount,
-    currency: "gbp",
-    automatic_payment_methods: {
-      enabled: true,
-    },
-    description,
-    shipping: {
-      address: {
-        line1: shipping.line1,
-        line2: shipping.line2,
-        city: shipping.city,
-        country: shipping.country,
-        postal_code: shipping.postal_code,
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: orderAmount,
+      currency: "gbp",
+      automatic_payment_methods: {
+        enabled: true,
       },
-      name: shipping.name,
-      phone: shipping.phone,
-    },
-  });
+      description,
+      shipping: {
+        address: {
+          line1: shipping.line1,
+          line2: shipping.line2,
+          city: shipping.city,
+          country: shipping.country,
+          postal_code: shipping.postal_code,
+        },
+        name: shipping.name,
+        phone: shipping.phone,
+      },
+    });
 
-  res.send({
-    clientSecret: paymentIntent.client_secret,
-  });
+    res.send({
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to process payment" });
+  }
 });
 
 module.exports = {
