@@ -37,14 +37,14 @@ const orderSchema = mongoose.Schema(
     },
 
     cartItems: {
-      //   type: [Object],
-      type: String,
-      //   required: [true],
+        type: [Object],
+      // type: String,
+        required: [true],
     },
 
     shippingAddress: {
-      //   type: Object,
-      type: String,
+        type: Object,
+      // type: String,
       required: true,
     },
 
