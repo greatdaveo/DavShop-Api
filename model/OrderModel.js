@@ -5,7 +5,7 @@ const orderSchema = mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      re: "User",
+      ref: "User",
     },
 
     orderDate: {
@@ -37,13 +37,13 @@ const orderSchema = mongoose.Schema(
     },
 
     cartItems: {
-        type: [Object],
+      type: [Object],
       // type: String,
-        required: [true],
+      required: [true],
     },
 
     shippingAddress: {
-        type: Object,
+      type: Object,
       // type: String,
       required: true,
     },
