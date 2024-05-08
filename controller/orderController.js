@@ -6,6 +6,7 @@ const dotenv = require("dotenv");
 const sendEmail = require("../utils/sendEmail");
 const { orderSuccessEmail } = require("../emailTemplates/orderTemplate");
 dotenv.config();
+const axios = require("axios");
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
@@ -154,10 +155,42 @@ const payWithStripe = asyncHandler(async (req, res) => {
   }
 });
 
+// For Flutterwave Payment Integration
+const verifyFlutterwavePayment = asyncHandler(async (req, res) => {
+  const { transaction_id } = req.query;
+  // To confirm transaction
+  const url = `https://api.flutterwave.com/v3/transactions/${transaction_id}/verify`;
+  const response = axios({
+    url,
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: process.env.FLUTTERWAVE_SECRET_KEY,
+    },
+  });
+
+  console.log(response.data);
+  const { tx_ref } = response.data.data;
+
+  const successURL =
+    process.env.FRONTEND_URL +
+    `/checkout-flutterwave?payment=successful&ref=${tx_ref}`;
+  const failureURL =
+    process.env.FRONTEND_URL + `/checkout-flutterwave?payment=failed`;
+
+  if (req.query.status === "successful") {
+    res.redirect(successURL);
+  } else {
+    res.redirect(failureURL);
+  }
+});
+
 module.exports = {
   createOrder,
   getAllOrders,
   singleOrder,
   updateOrderStatus,
   payWithStripe,
+  verifyFlutterwavePayment,
 };
