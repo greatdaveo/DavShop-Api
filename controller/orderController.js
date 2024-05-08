@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const OrderModel = require("../model/OrderModel");
 const ProductModel = require("../model/ProductModel");
-const { calculateTotalPrice } = require("../utils");
+const { calculateTotalPrice, updateProductQuantity } = require("../utils");
 const dotenv = require("dotenv");
 const sendEmail = require("../utils/sendEmail");
 const { orderSuccessEmail } = require("../emailTemplates/orderTemplate");
@@ -9,6 +9,7 @@ dotenv.config();
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
+// To create a new order
 const createOrder = asyncHandler(async (req, res) => {
   const {
     orderDate,
@@ -37,6 +38,9 @@ const createOrder = asyncHandler(async (req, res) => {
     paymentMethod,
     coupon,
   });
+
+  // To Update the Product Quantity when an Order is placed
+  await updateProductQuantity(cartItems);
 
   // To Send Order Email to the user
   const subject = "New Order Placed - DeeShop App";

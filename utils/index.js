@@ -1,3 +1,5 @@
+const ProductModel = require("../model/ProductModel");
+
 // To Calculate Total Price
 const calculateTotalPrice = (products, cartItems) => {
   let totalPrice = 0;
@@ -17,4 +19,21 @@ const calculateTotalPrice = (products, cartItems) => {
   return totalPrice * 100;
 };
 
-module.exports = { calculateTotalPrice };
+const updateProductQuantity = async (cartItems) => {
+  let bulkOption = cartItems.map((product) => {
+    return {
+      updateOne: {
+        filter: { _id: product._id },
+        update: {
+          $inc: {
+            quantity: -product.cartQuantity,
+            sold: +product.cartQuantity,
+          },
+        },
+      },
+    };
+  });
+  await ProductModel.bulkWrite(bulkOption, {});
+};
+
+module.exports = { calculateTotalPrice, updateProductQuantity };

@@ -24,7 +24,7 @@ const sendEmail = async (subject, send_to, template, reply_to, cc) => {
 
   const emailTemplate = mailGenerator.generate(template);
   // To preview the generated Email
-  require("fs").writeFileSync("preview.html", emailTemplate, "utf8");
+  // require("fs").writeFileSync("preview.html", emailTemplate, "utf8");
 
   // Options for sending the Email
   const options = {
