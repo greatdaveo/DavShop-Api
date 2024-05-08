@@ -3,6 +3,8 @@ const OrderModel = require("../model/OrderModel");
 const ProductModel = require("../model/ProductModel");
 const { calculateTotalPrice } = require("../utils");
 const dotenv = require("dotenv");
+const sendEmail = require("../utils/sendEmail");
+const { orderSuccessEmail } = require("../emailTemplates/orderTemplate");
 dotenv.config();
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
@@ -36,7 +38,15 @@ const createOrder = asyncHandler(async (req, res) => {
     coupon,
   });
 
-  res.status(201).json({ message: "You order has been created!" });
+  // To Send Order Email to the user
+  const subject = "New Order Placed - DeeShop App";
+  const send_to = req.user.email;
+  const template = orderSuccessEmail(req.user.name, cartItems);
+  const reply_to = "no_reply@deeshop-app.com";
+
+  await sendEmail(subject, send_to, template, reply_to);
+
+  res.status(201).json({ message: "Your order has been created!" });
 });
 
 const getAllOrders = asyncHandler(async (req, res) => {
