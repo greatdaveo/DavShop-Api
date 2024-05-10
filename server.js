@@ -24,7 +24,6 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://dee-shop-online-store.netlify.app",
       "https://dee-shop-online-store.vercel.app",
     ],
     credentials: true,
