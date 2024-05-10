@@ -10,7 +10,7 @@ const brandRoute = require("./routes/brandRoute");
 const couponRoute = require("./routes/couponRoute");
 const orderRoute = require("./routes/orderRoute");
 
-const errorHandler = require("../api/Middleware/errorHandler");
+const errorHandler = require("./Middleware/errorHandler");
 
 dotenv.config();
 
