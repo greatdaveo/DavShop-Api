@@ -1,5 +1,6 @@
 const express = require("express");
 const {
+  googleAuth,
   registerUser,
   loginUser,
   logoutUser,
@@ -13,6 +14,8 @@ const { protect, userLoginStatus } = require("../Middleware/authMiddleware");
 
 const router = express.Router();
 
+// Google Auth
+router.post("/google", googleAuth);
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/logout", logoutUser);
@@ -23,8 +26,5 @@ router.patch("/update-photo", protect, updatePhoto);
 // For the cart saved in the database
 router.patch("/save-cart", protect, saveCart);
 router.get("/get-cart", protect, getCart);
-
-
-
 
 module.exports = router;

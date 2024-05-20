@@ -41,8 +41,6 @@ app.use("/api/brand", brandRoute);
 app.use("/api/coupon", couponRoute);
 app.use("/api/order", orderRoute);
 
-
-
 app.get("/test", (req, res) => {
   res.send("API Testing!!!");
 });

@@ -8,6 +8,48 @@ const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 };
 
+const googleAuth = asyncHandler(async (req, res) => {
+  try {
+    const { name, email, photo } = req.body;
+
+    console.log("Request received:", req.body);
+
+    let user = await UserModel.findOne({ email });
+    if (user) {
+      console.log("User found:", user);
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      const { password, ...otherInfo } = user._doc;
+      return res
+        .cookie("access_token", token, { httpOnly: true })
+        .status(200)
+        .json(otherInfo);
+    }
+
+    // If user account does not exist
+    const generatedPassword = Math.random().toString(36).slice(-8);
+    const hashedPassword = bcrypt.hashSync(generatedPassword, 10);
+    const newUser = new UserModel({
+      name,
+      email,
+      password: hashedPassword,
+      photo,
+    });
+
+    await newUser.save();
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+    const { password, ...otherInfo } = newUser._doc;
+    return res
+      .cookie("access_token", token, { httpOnly: true })
+      .status(200)
+      .json(otherInfo);
+  } catch (error) {
+    console.error("Authentication Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+module.exports = { googleAuth };
+
 // Registration Controller
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -149,31 +191,32 @@ const updatePhoto = asyncHandler(async (req, res) => {
 });
 
 // To save cart in the database
-const saveCart =asyncHandler(async (req, res) => {
-  const {cartItems} = req.body;
-  const user = await UserModel.findById(req.user._id)
-  if(user) {
-    user.cartItems = cartItems
-    user.save()
-    res.status(200).json({message: "Cart saved successfully"})
-  } else {
-    res.status(404);
-    throw new Error("User not found!")
-  }
-})
-
-const getCart = asyncHandler(async (req, res) =>{
+const saveCart = asyncHandler(async (req, res) => {
   const { cartItems } = req.body;
   const user = await UserModel.findById(req.user._id);
-  if (user) {  
+  if (user) {
+    user.cartItems = cartItems;
+    user.save();
+    res.status(200).json({ message: "Cart saved successfully" });
+  } else {
+    res.status(404);
+    throw new Error("User not found!");
+  }
+});
+
+const getCart = asyncHandler(async (req, res) => {
+  const { cartItems } = req.body;
+  const user = await UserModel.findById(req.user._id);
+  if (user) {
     res.status(200).json(user.cartItems);
   } else {
     res.status(404);
     throw new Error("User not found!");
   }
-})
+});
 
 module.exports = {
+  googleAuth,
   registerUser,
   loginUser,
   logoutUser,
