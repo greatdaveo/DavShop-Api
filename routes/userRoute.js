@@ -15,7 +15,7 @@ const { protect, userLoginStatus } = require("../Middleware/authMiddleware");
 const router = express.Router();
 
 // Google Auth
-router.post("/google", googleAuth);
+router.post("/google-auth", googleAuth);
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/logout", logoutUser);

@@ -9,8 +9,10 @@ const categoryRoute = require("./routes/categoryRoute");
 const brandRoute = require("./routes/brandRoute");
 const couponRoute = require("./routes/couponRoute");
 const orderRoute = require("./routes/orderRoute");
-
 const errorHandler = require("./Middleware/errorHandler");
+// For Firebase Auth
+const firebaseAdmin = require("firebase-admin");
+const serviceAccountKey = require("./serviceAccountKey.json");
 
 dotenv.config();
 
@@ -20,6 +22,12 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
+
+// For Firebase
+firebaseAdmin.initializeApp({
+  credential: firebaseAdmin.credential.cert(serviceAccountKey),
+});
+
 app.use(
   cors({
     origin: [

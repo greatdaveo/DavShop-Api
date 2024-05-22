@@ -21,8 +21,18 @@ const UserSchema = mongoose.Schema(
 
     password: {
       type: String,
-      required: [true, "Please add a password!"],
+      required: [
+        function () {
+          return !this.google_auth; 
+        },
+        "Please add a password!",
+      ],
       minLength: [6, "Password must be up to 6 characters"],
+    },
+
+    google_auth: {
+      type: Boolean,
+      default: false,
     },
 
     role: {
