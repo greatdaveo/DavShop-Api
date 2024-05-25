@@ -17,6 +17,6 @@
     "stripe": "^15.4.0"
   },
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "node server.js"
   }
 }
