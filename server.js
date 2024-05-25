@@ -33,7 +33,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://dee-shop-online-store.vercel.app",
+      "https://davshop-online-store.vercel.app",
     ],
     credentials: true,
   })
