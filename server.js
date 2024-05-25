@@ -12,7 +12,8 @@ const orderRoute = require("./routes/orderRoute");
 const errorHandler = require("./Middleware/errorHandler");
 // For Firebase Auth
 const firebaseAdmin = require("firebase-admin");
-const serviceAccountKey = require("./serviceAccountKey.json");
+// const serviceAccountKey = require("./serviceAccountKey.json");
+const serviceAccountKey = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
 
 dotenv.config();
 
