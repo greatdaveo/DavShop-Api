@@ -32,8 +32,8 @@ firebaseAdmin.initializeApp({
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",
       "https://davshop-online-store.vercel.app",
+      "http://localhost:5173",
     ],
     credentials: true,
   })
