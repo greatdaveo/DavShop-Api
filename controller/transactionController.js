@@ -3,6 +3,7 @@ const UserModel = require("../model/UserModel");
 const e = require("cors");
 const TransactionModel = require("../model/TransactionModel");
 
+// To Transfer Funds
 const transferFund = asyncHandler(async (req, res) => {
   const { amount, sender, receiver, description, status } = req.body;
 
@@ -37,6 +38,21 @@ const transferFund = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Transaction successful!" });
 });
 
+// Verify Account
+const verifyAccount = asyncHandler(async (req, res) => {
+  //   To check if the receiver exist
+  const fundReceiver = await UserModel.findOne({ email: req.body.receiver });
+
+  if (!fundReceiver) {
+    res.status(400);
+    throw new Error("User Account Not Found!");
+  }
+
+  //   If receiver account is found
+  res.status(200).json({ message: "Account Verification Successful!" });
+});
+
 module.exports = {
   transferFund,
+  verifyAccount,
 };
