@@ -38,9 +38,9 @@ const transferFund = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Transaction successful!" });
 });
 
-// Verify Account
+// To Verify Receiver Account
 const verifyAccount = asyncHandler(async (req, res) => {
-  //   To check if the receiver exist
+  // To check if the receiver exist
   const fundReceiver = await UserModel.findOne({ email: req.body.receiver });
 
   if (!fundReceiver) {
@@ -52,7 +52,26 @@ const verifyAccount = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Account Verification Successful!" });
 });
 
+// To Get Individual Transaction Records
+const getUserTransactions = asyncHandler(async (req, res) => {
+  if (req.user.email !== req.body.email) {
+    res.status(400);
+    throw new Error("Not authorized to view transaction");
+  }
+
+  const transactions = await TransactionModel.find({
+    // This is to get when a particular user is a sender or a receiver
+    $or: [{ sender: req.body.email }, { receiver: req.body.email }],
+  })
+    .sort({ createdAt: -1 })
+    .populate("sender")
+    .populate("receiver");
+
+  res.status(200).json(transactions);
+});
+
 module.exports = {
   transferFund,
   verifyAccount,
+  getUserTransactions,
 };
