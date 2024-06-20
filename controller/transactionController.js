@@ -20,13 +20,13 @@ const transferFund = asyncHandler(async (req, res) => {
     throw new Error("Insufficient balance!");
   }
 
-  // Decrease sender's account balance
+  // TO Decrease sender's account balance
   await UserModel.findOneAndUpdate(
     { email: sender },
     { $inc: { accountBalance: -amount } }
   );
 
-  // Increase receiver's account balance
+  // To Increase receiver's account balance
   await UserModel.findOneAndUpdate(
     { email: receiver },
     { $inc: { accountBalance: amount } }
@@ -111,9 +111,77 @@ const depositFundWithTripe = asyncHandler(async (req, res) => {
   return res.json(stripeSession);
 });
 
+// :::: DEPOSIT FUND FUNCTION FOR BOT Stripe and Flutterwave ::::
+const depositFund = async (customer, data, description, source) => {
+  await TransactionModel.create({
+    amount:
+      source === "stripe" ? data.amount_subtotal / 100 : data.amount_subtotal,
+    sender: "Self",
+    receiver: customer.email,
+    description,
+    status: "success",
+  });
+
+  // To Increase receiver's account balance
+  await UserModel.findOneAndUpdate(
+    { email: customer.email },
+    {
+      $inc: {
+        accountBalance:
+          source === "stripe"
+            ? data.amount_subtotal / 100
+            : data.amount_subtotal,
+      },
+    }
+  );
+};
+
+// FOR Strip Webhook
+const stripeEndPointSecret = process.env.STRIPE_ENDPOINT_SECRET;
+
+const stripeWebhook = asyncHandler(async (req, res) => {
+  const signature = req.header("stripe-signature");
+
+  let data;
+  let event;
+  let eventType;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      signature,
+      stripeEndPointSecret
+    );
+
+    console.log("Webhook verified!");
+  } catch (error) {
+    console.log("Webhook Error: ", error.message);
+    res.status(400).send(`Webhook Error: ${error.message}`);
+    return;
+  }
+
+  data = event.data.object;
+  eventType = event.eventType;
+
+  if (eventType === "checkout.session.completed") {
+    stripe.customers
+      .retrieve(data.customer)
+      .then(async (customer) => {
+        // Deposit funds into customer's account
+        const description = "Stripe Deposit";
+        const source = "stripe";
+
+        depositFund(customer, data, description, source);
+      })
+      .catch((err) => console.log(err.message));
+  }
+  res.send().end();
+});
+
 module.exports = {
   transferFund,
   verifyAccount,
   getUserTransactions,
   depositFundWithTripe,
+  stripeWebhook,
 };

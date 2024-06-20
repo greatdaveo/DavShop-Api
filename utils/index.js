@@ -39,4 +39,6 @@ const updateProductQuantity = async (cartItems) => {
   await ProductModel.bulkWrite(bulkOption, {});
 };
 
+
+
 module.exports = { stripe, calculateTotalPrice, updateProductQuantity };

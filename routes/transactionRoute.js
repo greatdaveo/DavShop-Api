@@ -5,6 +5,7 @@ const {
   verifyAccount,
   getUserTransactions,
   depositFundWithTripe,
+  stripeWebhook,
 } = require("../controller/transactionController");
 
 const router = express.Router();
@@ -24,6 +25,12 @@ router.post(
   express.json(),
   protect,
   depositFundWithTripe
+);
+
+router.post(
+  "/stripe-webhook",
+  express.raw({ type: "application/json" }),
+  stripeWebhook
 );
 
 module.exports = router;
