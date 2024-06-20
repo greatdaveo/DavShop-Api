@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const transactionRoute = require("./routes/transactionRoute");
 const userRoute = require("./routes/userRoute");
 const productRoute = require("./routes/ProductRoute");
 const categoryRoute = require("./routes/categoryRoute");
@@ -20,14 +21,8 @@ dotenv.config();
 const app = express();
 
 // Middlewares
-app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
-
-// For Firebase
-firebaseAdmin.initializeApp({
-  credential: firebaseAdmin.credential.cert(serviceAccountKey),
-});
 
 app.use(
   cors({
@@ -38,6 +33,16 @@ app.use(
     credentials: true,
   })
 );
+
+// Transaction routes
+app.use("/api/wallet", transactionRoute);
+// Middlewares
+app.use(express.json());
+
+// For Firebase
+firebaseAdmin.initializeApp({
+  credential: firebaseAdmin.credential.cert(serviceAccountKey),
+});
 
 // Error Middleware
 app.use(errorHandler);

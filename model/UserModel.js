@@ -23,7 +23,7 @@ const UserSchema = mongoose.Schema(
       type: String,
       required: [
         function () {
-          return !this.google_auth; 
+          return !this.google_auth;
         },
         "Please add a password!",
       ],
@@ -51,6 +51,11 @@ const UserSchema = mongoose.Schema(
     phone: {
       type: String,
       default: "+44",
+    },
+
+    accountBalance: {
+      type: Number,
+      default: 0,
     },
 
     address: {

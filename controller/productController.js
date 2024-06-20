@@ -78,7 +78,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
 // To Update Product
 const updateProduct = asyncHandler(async (req, res) => {
-  // console.log(req.params.id)
+  console.log(req.params.id);
   const {
     name,
     category,
@@ -187,7 +187,7 @@ const updateReview = asyncHandler(async (req, res) => {
   }
 
   const reviewedProduct = await ProductModel.findById(id);
-//   console.log("Reviewed Product: ", reviewedProduct);
+  //   console.log("Reviewed Product: ", reviewedProduct);
 
   if (!reviewedProduct) {
     res.status(404);
@@ -195,7 +195,7 @@ const updateReview = asyncHandler(async (req, res) => {
   }
 
   // To edit and update a review made previously
-    // mongoose.set("debug", true);
+  // mongoose.set("debug", true);
   const updatedReview = await ProductModel.findOneAndUpdate(
     {
       // To check for the two parameters I want to update
