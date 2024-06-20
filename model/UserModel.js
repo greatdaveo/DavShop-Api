@@ -66,6 +66,10 @@ const UserSchema = mongoose.Schema(
     cartItems: {
       type: [Object],
     },
+    // To create a stripe customer with the user account
+    stripeCustomerId: {
+      type: String,
+    },
   },
 
   { timestamps: true }

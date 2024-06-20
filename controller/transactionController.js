@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const UserModel = require("../model/UserModel");
-const e = require("cors");
 const TransactionModel = require("../model/TransactionModel");
+const { stripe } = require("../utils");
 
 // To Transfer Funds
 const transferFund = asyncHandler(async (req, res) => {
@@ -70,8 +70,50 @@ const getUserTransactions = asyncHandler(async (req, res) => {
   res.status(200).json(transactions);
 });
 
+// To deposit funds with stripe
+const depositFundWithTripe = asyncHandler(async (req, res) => {
+  const { amount } = req.body;
+
+  const user = await UserModel.findById(req.user._id);
+  // To create a stripe customer with the user account
+  if (!user.stripeCustomerId) {
+    const customer = await stripe.customers.create({
+      email: user.email,
+    });
+    // This will create stripeCustomerId when the user does not have a stripe id in the DB
+    user.stripeCustomerId = customer;
+    user.save();
+  }
+
+  //    To create Stripe checkout session
+  const stripeSession = await stripe.checkout.create({
+    mode: "payment",
+    payment_method_types: ["card"],
+    line_items: [
+      {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: "DavShop Wallet Deposit...",
+            description: `Make a deposit of $${amount} to your DavShop wallet.`,
+          },
+          unit_amount: amount * 100,
+        },
+        quantity: 1,
+      },
+    ],
+    customer: user.stripeCustomerId,
+    success_url: `${process.env.FRONTEND_URL}/wallet?payment=successful&amount=${amount}`,
+    cancel_url: `${process.env.FRONTEND_URL}?/wallet?payment=failed`,
+  });
+
+  // To send to the frontend
+  return res.json(stripeSession);
+});
+
 module.exports = {
   transferFund,
   verifyAccount,
   getUserTransactions,
+  depositFundWithTripe,
 };

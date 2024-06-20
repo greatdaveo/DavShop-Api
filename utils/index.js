@@ -1,5 +1,8 @@
 const ProductModel = require("../model/ProductModel");
 
+// For Stripe Payment Integration
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
 // To Calculate Total Price
 const calculateTotalPrice = (products, cartItems) => {
   let totalPrice = 0;
@@ -36,4 +39,4 @@ const updateProductQuantity = async (cartItems) => {
   await ProductModel.bulkWrite(bulkOption, {});
 };
 
-module.exports = { calculateTotalPrice, updateProductQuantity };
+module.exports = { stripe, calculateTotalPrice, updateProductQuantity };
